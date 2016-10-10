@@ -11,11 +11,17 @@ var canvas = document.getElementById("draw");
 canvas.width = 500;
 canvas.height = 500;
 var ctx = canvas.getContext("2d");
+
 ctx.beginPath();
 ctx.moveTo(300, 300);
 ctx.lineTo(200, 300);
 ctx.lineTo(200, 200);
 ctx.closePath();
+ctx.fill();
+
+
+ctx.beginPath();
+ctx.arc(100, 150, 50, 0, 2 * Math.PI);
 ctx.fill();
         </script>
 
