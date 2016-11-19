@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            すとまとの可視化ツール
+        </title>
+        <meta charset="UTF-8">
+        <script src="d3.v4.min.js"></script>
+    </head>
+	<body>
+        <button id="bubble_sort">bubble sort</button>
+        <button id="selection_sort">selection sort</button>
+        <button id="quick_sort">quick sort</button>
+        <div><p id="result"></p></div>
+		<script>
+var Width = 1000, Height = 500;
+var w = 40, height_rate = 4;
+var svg = d3.select("body")
+            .append("svg")
+            .attr("width", Width)
+            .attr("height", Height);
+
+var data_height = function(d){return d * height_rate;}
+var data_y = function(d){return Height - d * height_rate;}
+var data_x = function(d, i){return (w + 1) * i;}
+var not_selected_color = "red", swaped_color = "blue", not_changed_color = "green";
+var data;
+function visible(data){
+    svg.selectAll("rect")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("width", w)
+            .attr("height", data_height)
+            .attr("x" , data_x)
+            .attr("y", data_y)
+            .attr("fill", "red");
+}
+
+function create(){
+    data = [];
+    for(var i = 0; i < 5; i++){
+        data.push(Math.floor(Math.random() * 100));
+    }
+    visible(data);
+    return data;
+}
+
+function change_color(before, after, changed){
+    svg.selectAll("rect")
+        .attr("fill", function(d, i){
+                if(changed.includes(i)){
+                    return after;
+                }else{
+                    return before;
+                }
+        });
+}
+
+
+function selection_sort(){
+    var length = data.length;
+    var i = 0, j = 1, min = 0;
+    var time = 1000;
+    var loop = function(){
+        if(i >= length - 1){
+            console.log(data);
+            return;
+        }else if(j >= length){
+            change_color(not_selected_color, swaped_color, [min, i]);
+            var tmp = data[i];
+            data[i] = data[min];
+            data[min] = tmp;
+            i++;
+            j = i + 1;
+            min = i;
+            update(data);
+        }else{
+            console.log(i + "" + j);
+            change_color(not_selected_color, not_changed_color ,[min, j]);
+            if(data[j] < data[min]){
+                min = j;
+            }
+            j++;
+        }
+        
+        setTimeout(loop, time);
+    };
+    loop();
+}
+
+function quick_sort(){
+    var time = 1000;
+    var loop = function(){
+        var length = data.length;
+        var top = 0, bottom = length - 1;
+        var devided;
+        var devide = function(){
+            console.log(top + ", " + bottom);
+            if(top >= bottom){
+                devided = top;
+                return;
+            }else{
+                if(data[top] < data[top + 1]){
+                    change_color(not_selected_color, swaped_color, [top, top + 1]);
+                    var tmp = data[top];
+                    data[top] = data[top + 1];
+                    data[top + 1] = tmp;
+                    top++;
+                }else{
+                    change_color(not_selected_color, swaped_color, [bottom, top + 1]);
+                    var tmp = data[top + 1];
+                   data[top + 1] = data[bottom];
+                   data[bottom] = tmp;
+                   bottom--;
+                }
+                update(data);
+            }
+            setTimeout(devide, time);
+        };
+        top = 0;
+        bottom = devided - 1;
+        devide();
+        /*
+        top = devided + 1;
+        bottom = length;
+        devide();
+        */
+    };
+    loop();
+}
+
+
+function display_result(num){
+    document.getElementById("result").innerHTML = num;
+}
+
+function bubble_sort(){
+    var length = data.length;
+    var i = length, j = 1, swaped = 0;
+    var time = 1000;
+    var loop = function(){
+        if(i <= 0){
+            display_result(swaped);
+            return;
+        }else if(j >= i){
+            j = 1;
+            i--;
+            time = 0;
+        }else{
+            time = 1000;
+            if(data[j] < data[j - 1]){
+                swaped++;
+                var tmp = data[j];
+                data[j] = data[j - 1];
+                data[j - 1] = tmp;
+                change_color(not_selected_color, swaped_color, [j - 1, j]);
+            }else{
+                change_color(not_selected_color, not_changed_color ,[j - 1, j]);
+            }
+            j++;
+            update(data);
+        }
+        console.log(i + "" + j);
+        setTimeout(loop, time);
+    };
+    loop();
+}
+function update(Data){
+    svg.selectAll("rect")
+       .data(Data)
+       // .update()
+       .attr("height", data_height)
+       .attr("y", data_y);
+}
+create();
+document.getElementById("bubble_sort").addEventListener("click", bubble_sort);
+document.getElementById("selection_sort").addEventListener("click", selection_sort);
+document.getElementById("quick_sort").addEventListener("click", quick_sort);
+		</script>
+	</body>
+</html>
