@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>カレンダー</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <script>
+function get_first(){
+    var date = new Date();
+    first = date.getDay() - (date.getDate() % 7) + 1;
+    if(first < 0) first + 7;
+    ret = [];
+    for(var i = 0; i < first; i++){
+        ret.push(0);
+    }
+    for(var i = 1; ret.length < 7; i++){
+        ret.push(i);
+    }
+    return ret;
+}
+
+function get_arr(){
+    var arr = get_first();
+    var last = arr[6];
+    var ret = [arr];
+    var flag = true;
+    var month_last = get_last();
+    while(flag){
+        arr = [];
+        for(var i = last + 1; i < last + 8; i++){
+            if(i > month_last){
+                flag = false;
+                arr.push(0);
+            }else{
+                arr.push(i);
+            }
+        }
+        ret.push(arr);
+        last = arr[6];
+    }
+    return ret;
+}
+function create_tr(arr){
+    var tr = document.createElement("tr");
+    console.log(arr);
+    for(var i = 0; i < arr.length; i++){
+        var td = document.createElement("td");
+        if(arr[i] != 0) td.innerHTML = arr[i].toString();
+        tr.appendChild(td);
+    }
+    return tr;
+}
+
+function create_title(){
+    var tr = document.createElement("tr");
+    var arr = ["日", "月", "火", "水", "木", "金", "土"];
+    for(var i = 0; i < arr.length; i++){
+        var th = document.createElement("th");
+        th.innerHTML = arr[i];
+        tr.appendChild(th);
+    }
+    return tr;
+}
+
+function get_last(){
+    var month = (new Date()).getMonth();
+    var lasts = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    for(var i = 0; i < lasts.length; i++){
+        console.log((i + 1) + ":" + lasts[i]);
+    }
+    return lasts[month];
+}
+
+function create_table(){
+    var table = document.createElement("table");
+    table.appendChild(create_title());
+    var arr = get_arr();
+    for(var i = 0; i < arr.length; i++){
+        var tr = create_tr(arr[i]);
+        table.appendChild(tr);
+    }
+    return table;
+}
+
+document.body.appendChild(create_table());
+        </script>
+    </body>
+</html>
