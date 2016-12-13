@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            すとまとの可視化ツール
+        </title>
+        <meta charset="UTF-8">
+        <script src="d3.v4.min.js"></script>
+        <style>
+rect {
+}
+        </style>
+    </head>
+	<body>
+		<script>
+var svg, num;
+
+function create_svg(){
+    svg = d3.select("body")
+                .append("svg")
+                .attr("width", 500)
+                .attr("height", 500);
+    return svg;
+}
+
+function create_rect(arr){
+    var size = 10;
+    num = 50;
+    var color = function(d, i){
+        if(d == 0){
+            return "red";
+        }else{
+            return "blue";
+        }
+    }
+    svg.selectAll("rect")
+       .data(arr)
+       .enter()
+       .append("rect")
+       .attr("width", size)
+       .attr("height", size)
+       .attr("x", function(d, i){return (i % num) * size;})
+       .attr("y", function(d, i){return Math.floor(i / num) * size;})
+       .attr("stroke", "black")
+       .attr("fill", color);
+}
+
+function create_data(){
+    arr = [];
+    for(var i = 0; i < 2500; i++){
+        arr.push(Math.floor(Math.random() * 2));
+    }
+    return arr;
+}
+
+function cellular_automaton(arr){
+    var ret = [];
+    function check_around(card){
+        var alive = 0;
+        for(var i = -1; i <= 1; i++){
+            var col = Math.floor(card / num) + i;
+            if(col < 0 || col >= num) continue;
+            for( var j = -1; j <= 1; j++){
+                var row = card % num + j;
+                if(row < 0 || row >= num) continue;
+                if(row == 0 && col == 0) continue;
+                if(arr[col * num + row] > 0) alive++;
+            }
+        }
+        return alive;
+    }
+    for(var i = 0; i < arr.length; i++){
+        var alive = check_around(i);
+        if(alive < 2){
+            ret.push(0);
+        }else if(alive == 2){
+            ret.push(arr[i]);
+        }else if(alive == 3){
+            ret.push(1);
+        }else{
+            ret.push(0);
+        }
+    }
+    return ret;
+}
+
+function update(data){
+    var color = function(d, i){
+        if(d == 0){
+            return "red";
+        }else{
+            return "blue";
+        }
+    }
+    svg.selectAll("rect")
+        .data(data)
+       .attr("fill", color);
+}
+
+window.onload = function(){
+    create_svg();
+    var data = create_data();
+    create_rect(data);
+    var loop = function(){
+        data = cellular_automaton(data);
+        update(data);
+        console.log(data);
+        setTimeout(loop, 1000);
+    };
+    loop();
+}
+		</script>
+	</body>
+</html>
