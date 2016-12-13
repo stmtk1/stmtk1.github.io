@@ -63,7 +63,7 @@ function cellular_automaton(arr){
             for( var j = -1; j <= 1; j++){
                 var row = card % num + j;
                 if(row < 0 || row >= num) continue;
-                if(row == 0 && col == 0) continue;
+                if(i == 0 && j == 0) continue;
                 if(arr[col * num + row] > 0) alive++;
             }
         }
