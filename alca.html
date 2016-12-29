@@ -13,7 +13,7 @@ svg{
     <script src="d3.v4.min.js" charset="UTF-8"></script>
     <script src="jquery.min.js" charset="UTF-8"></script>
     <script>
-var svg, racket, ball, blocks, vx = 2, vy = -2, width = 800, height = 600, r = 10, loop_func;
+var svg, racket, ball, blocks, vx = 2, vy = -2, width = 800, height = 600, r = 10, continuing;
 function create(){
      svg = d3.select("body").append("svg")
                                .attr("width", width)
@@ -106,16 +106,16 @@ function move_racket(key_event){
 
 function loop(){
     move_ball();
-    loop_func = setTimeout(loop, 10);
+    if(continuing) setTimeout(loop, 10);
 }
 
 function game_over(){
-    console.log(loop_func);
-    clearTimeout(loop_func);
-    // $("svg").empty();
+    continuing = false;
+    $("svg").empty();
 }
 
 $(function(){
+    continuing = true;
     document.addEventListener("keydown", move_racket);
     create();
     loop();
