@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>D3.js</title>
+    <style>
+svg{
+    background: #ddd;
+}
+    </style>
+  </head>
+  <body>
+    <script src="d3.v4.min.js" charset="UTF-8"></script>
+    <script src="jquery.min.js" charset="UTF-8"></script>
+    <script>
+var svg, racket, ball, blocks, vx = 2, vy = -2, width = 800, height = 600, r = 10, loop_func;
+function create(){
+     svg = d3.select("body").append("svg")
+                               .attr("width", width)
+                               .attr("height", height);
+
+    racket = svg.append("rect")
+                    .attr("width", 100)
+                    .attr("height", 10)
+                    .attr("x", 400)
+                    .attr("y", 550)
+                    .attr("fill", "red");
+
+    ball = svg.append("circle")
+                  .attr("r", r)
+                  .attr("cx", 450)
+                  .attr("cy", 530)
+                  .attr("fill", "green");
+    blocks = [];
+    for(var i = 0; i < 50; i++){
+        var block = svg.append("rect")
+                       .attr("class", "block")
+                       .attr("width", 50)
+                       .attr("height", 20)
+                       .attr("x", (i % 12) * 50)
+                       .attr("y", Math.floor((i / 12)) * 30)
+                       .attr("fill", "#ff0")
+                       .attr("stroke", "#000");
+        blocks.push(blocks);
+    }
+}
+
+
+function move_ball(){
+    var x = parseInt(ball.attr("cx"));
+    var y = parseInt(ball.attr("cy"));
+    function move_x(){
+        x += vx;
+        ball.attr("cx", x);
+        if(x + r > width || x - r < 0) vx *= -1;
+    }
+
+    function move_y(){
+        y += vy;
+        ball.attr("cy", y);
+        if(y + r > height) game_over();
+        if(y + r > height || y - r < 0) vy *= -1;
+    }
+
+    function reflect_racket(){
+        var r_x = parseInt(racket.attr("x"));
+        var r_y = parseInt(racket.attr("y"));
+        var r_w = parseInt(racket.attr("width"));
+        if(x + r > r_x && x - r < r_x + r_w && y + r > r_y) vy *= -1;
+    }
+
+    function reflect_block(){
+        var block = d3.selectAll("rect.block");
+        var width = parseInt(block.attr("width")), height = parseInt(block.attr("height"));
+        $("rect.block").each(function(){
+            var b_x = parseInt($(this).attr("x"));
+            var b_y = parseInt($(this).attr("y"));
+            if(x - r < b_x + width
+                    && x + r > b_x
+                    && y - r < b_y + height
+                    && y + r > b_y){
+                vx *= -1;
+                vy *= -1;
+                $(this).remove();
+            }
+        });
+    }
+    
+    reflect_block();
+    reflect_racket();
+    move_x();
+    move_y();
+}
+
+function move_racket(key_event){
+    var key_code = key_event.keyCode;
+    if(key_code == 37){
+        var x = parseInt(racket.attr("x"));
+        if(x > 0) racket.attr("x", x - 10);
+    }else if(key_code == 39){
+        var x = parseInt(racket.attr("x"));
+        var r_width = parseInt(racket.attr("width"));
+        if(x + r_width < width) racket.attr("x", x + 10);
+    }
+}
+
+function loop(){
+    move_ball();
+    loop_func = setTimeout(loop, 10);
+}
+
+function game_over(){
+    console.log(loop_func);
+    clearTimeout(loop_func);
+    // $("svg").empty();
+}
+
+$(function(){
+    document.addEventListener("keydown", move_racket);
+    create();
+    loop();
+});
+
+    </script>
+  </body>
+</html>
