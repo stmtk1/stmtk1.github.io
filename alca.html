@@ -13,14 +13,15 @@ svg{
     <script src="d3.v4.min.js" charset="UTF-8"></script>
     <script src="jquery.min.js" charset="UTF-8"></script>
     <script>
-var svg, racket, ball, blocks, vx = 2, vy = -2, width = 800, height = 600, r = 10, continuing;
+var svg, racket, ball, blocks, vx = 2, vy = -2, width = 800, height = 600, r = 10, continuing, left = 37, right = 39, default_width = 100;
+var default_vx = 2, default_vy = -2;
 function create(){
      svg = d3.select("body").append("svg")
                                .attr("width", width)
                                .attr("height", height);
 
     racket = svg.append("rect")
-                    .attr("width", 100)
+                    .attr("width", default_width)
                     .attr("height", 10)
                     .attr("x", 400)
                     .attr("y", 550)
@@ -45,6 +46,41 @@ function create(){
     }
 }
 
+function reflect_event(){
+    function reset(){
+        left = 37;
+        right = 39;
+        racket.attr("width", default_width);
+        vx = default_vx;
+        vy = default_vy;
+    }
+    
+    var reverse_move = function(){
+        var tmp = left;
+        left = right;
+        right = tmp;
+    };
+    
+    var double_size = function(){
+        var width = parseInt(racket.attr("width")) * 2;
+        racket.attr("width", width);
+    };
+
+    var twice_vel = function(){
+        vx *= 2;
+        vy *= 2;
+    };
+    
+    reset();
+    var rand = Math.floor(Math.random() * 10);
+    if(rand < 7){
+        twice_vel();
+    }else if(rand < 9){
+        reverse_move();
+    }else{
+        double_size();
+    }
+}
 
 function move_ball(){
     var x = parseInt(ball.attr("cx"));
@@ -66,7 +102,10 @@ function move_ball(){
         var r_x = parseInt(racket.attr("x"));
         var r_y = parseInt(racket.attr("y"));
         var r_w = parseInt(racket.attr("width"));
-        if(x + r > r_x && x - r < r_x + r_w && y + r > r_y) vy *= -1;
+        if(x + r > r_x && x - r < r_x + r_w && y + r > r_y){
+            vy *= -1;
+            reflect_event();
+        }
     }
 
     function reflect_block(){
@@ -94,10 +133,10 @@ function move_ball(){
 
 function move_racket(key_event){
     var key_code = key_event.keyCode;
-    if(key_code == 37){
+    if(key_code == left){
         var x = parseInt(racket.attr("x"));
         if(x > 0) racket.attr("x", x - 10);
-    }else if(key_code == 39){
+    }else if(key_code == right){
         var x = parseInt(racket.attr("x"));
         var r_width = parseInt(racket.attr("width"));
         if(x + r_width < width) racket.attr("x", x + 10);
