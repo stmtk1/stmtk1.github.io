@@ -14,6 +14,8 @@ var time = 0;
 var line = d3.svg.line()
             .x(function (data){ return data[0]; })
             .y(function (data){ return data[1]; });
+var last = width / 2;
+var cy = height / 2;
 function create_svg(){
     svg = d3.select("body").append("svg")
         .attr("width", width)
@@ -21,27 +23,38 @@ function create_svg(){
 }
 
 function create_obj(){
-    pos = [[0, height / 2], [width / 2, height / 2]];
+    pos = [[0, height / 2], [last, height / 2]];
     
     svg.append("path")
         .attr("stroke", "#000")
+        .attr("fill", "#fff")
         .attr("d", line(pos))
         .attr("id", "spring");
 
     svg.append("circle")
         .attr("r", r)
-        .attr("cx", r + pos[1][0])
-        .attr("cy", pos[1][1])
+        .attr("cx", r + last)
+        .attr("cy", cy)
         .attr("fill", "#f11")
         .attr("id", "ball");
 }
 
+function set_pos(){
+    pos = [];
+    var herz = 20 * Math.PI / last;
+    var diff = 0.0001 * Math.PI * last;
+    for(var i = 0; i < last; i += diff){
+        pos.push([i, height / 2 + Math.sin(herz * i) * r]);
+    }
+}
+
 function move_ball(){
-    pos[1][0] = (Math.sin(time) + 1) / 2 * (width - r * 2);
+    last = (Math.sin(time) + 1) / 2 * (width - r * 2);
+    set_pos();
     svg.select("#spring")
         .attr("d", line(pos));
     svg.select("#ball")
-        .attr("cx", pos[1][0] + r);
+        .attr("cx", last + r);
     time += Math.PI / 100;
     setTimeout(move_ball, 1);
 }
