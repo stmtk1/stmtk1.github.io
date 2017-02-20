@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <h1>バネ</h1>
+        <script src="d3.v3.js"></script>
+        <script>
+var svg, pos;
+var height = 500, width = 500;
+var r = 50;
+var time = 0;
+var line = d3.svg.line()
+            .x(function (data){ return data[0]; })
+            .y(function (data){ return data[1]; });
+function create_svg(){
+    svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+}
+
+function create_obj(){
+    pos = [[0, height / 2], [width / 2, height / 2]];
+    
+    svg.append("path")
+        .attr("stroke", "#000")
+        .attr("d", line(pos))
+        .attr("id", "spring");
+
+    svg.append("circle")
+        .attr("r", r)
+        .attr("cx", r + pos[1][0])
+        .attr("cy", pos[1][1])
+        .attr("fill", "#f11")
+        .attr("id", "ball");
+}
+
+function move_ball(){
+    pos[1][0] = (Math.sin(time) + 1) / 2 * (width - r * 2);
+    svg.select("#spring")
+        .attr("d", line(pos));
+    svg.select("#ball")
+        .attr("cx", pos[1][0] + r);
+    time += Math.PI / 100;
+    setTimeout(move_ball, 1);
+}
+
+create_svg();
+create_obj();
+move_ball();
+        </script>
+    </body>
+</html>
