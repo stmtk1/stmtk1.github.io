@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>コッホ曲線</title>
+    </head>
+    <body>
+        <canvas id="fractal"></canvas>
+        <script>
+var canvas = document.getElementById("fractal");
+canvas.width = 500;
+canvas.height = 500;
+
+var ctx = canvas.getContext("2d");
+
+function koch(a1, a2, b1, b2, n){
+    var o1 = a1;
+    var o2 = a2;
+    var p1 = (b1 - a1) / 3 + a1;
+    var p2 = (b2 - a2) / 3 + a2;
+    var q1 = (b1 - a1) * 2 / 3 + a1;
+    var q2 = (b2 - a2) * 2 / 3 + a2;
+    var r1 = b1;
+    var r2 = b2;
+
+    var distance = Math.sqrt((b1 - a1) * (b1 - a1) + (b2 - a2) * (b2 - a2)) / Math.sqrt(3);
+    if((b1 - a1) >= 0){
+        var angle1 = Math.atan(-(b2 - a2) / (b1 - a1)) + Math.PI / 6;
+        var s1 = a1 + (distance * Math.cos(angle1));
+        var s2 = a2 - (distance * Math.sin(angle1));
+    }else{
+        var angle2 = Math.atan(-(b2 - a2) / (b1 - a1)) - Math.PI / 6;
+        var s1 = b1 +  (distance * Math.cos(angle2));
+        var s2 = b2 - (distance * Math.sin(angle2));
+    }
+    if(n <= 0){
+        ctx.beginPath();
+        ctx.moveTo(o1, o2);
+        ctx.lineTo(p1, p2);
+        ctx.lineTo(q1, q2);
+        ctx.lineTo(r1, r2);
+        ctx.stroke();
+    }else {
+        koch(o1, o2, p1, p2, n - 1);
+        koch(p1, p2, s1, s2, n - 1);
+        koch(s1, s2, q1, q2, n - 1);
+        koch(q1, q2, r1, r2, n - 1);
+    }
+}
+
+koch(20, 280, 170, 20.2, 5);
+koch(170, 20.2, 320, 280, 5);
+koch(320, 280, 20, 280, 5);
+        </script>
+    </body>
+</html>

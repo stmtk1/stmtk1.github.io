@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>雷</title>
+    </head>
+    <body>
+        <canvas id="thunder"></canvas>
+        <script>
+var canvas = document.getElementById("thunder");
+var ctx = canvas.getContext("2d");
+canvas.width = 500;
+canvas.height = 500;
+ctx.lineCap = "round";
+ctx.globalCompositeOperation = "source-over";
+canvas.style.backgroundColor = "#191970";
+ctx.fillRect(0, 0, canvas.with, canvas.height);
+ctx.strokeStyle = "#ff0";
+
+function thunder(x, y, width, theta, depth){
+    if(depth <= 0) return [];
+    if(depth % 5 == 0) width -= 1;
+    if(Math.floor(Math.random() * 10) == 1 && depth > 2){
+        var branch = thunder(x, y, width, depth - 1);
+        console.log(branch);
+        draw(branch);
+    }
+    var new_x = x + 10 * Math.cos(theta);
+    var new_y = y - 10 * Math.sin(theta);
+    var new_theta;
+    if(theta < Math.PI / (-2))
+        new_theta = theta + Math.random() * Math.PI / 2;
+    else if(theta >= Math.PI / (-2))
+        new_theta = theta - Math.random() * Math.PI / 2;
+    var ret = thunder(new_x, new_y, width, new_theta, depth - 1);
+    ret.push([x, y, width]);
+    return ret;
+}
+
+function draw(arr){
+    var first = arr.shift();
+    var second = arr.shift();
+    ctx.beginPath();
+    ctx.lineWidth = first[2];
+    ctx.moveTo(first[0], first[1]);
+    ctx.lineTo(second[0], second[1]);
+    ctx.stroke();
+    while(arr.length != 0){
+        second = first;
+        first = arr.shift();
+        ctx.beginPath();
+        ctx.lineWidth = first[2];
+        ctx.moveTo(first[0], first[1]);
+        ctx.lineTo(second[0], second[1]);
+        ctx.stroke();
+    }
+}
+
+var pos = thunder(canvas.width / 2, 0, 10, Math.PI * (-1 / 2), 40);
+draw(pos);
+
+        </script>
+    </body>
+</html>

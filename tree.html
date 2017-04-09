@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>コッホ曲線</title>
+    </head>
+    <body>
+        <canvas id="fractal"></canvas>
+        <script>
+var canvas = document.getElementById("fractal");
+canvas.width = 800;
+canvas.height = 800;
+
+var ctx = canvas.getContext("2d");
+
+function tree(x, y, len, theta, depth){
+    if(depth <= 0) 
+        return;
+    else if(depth < 10) 
+        ctx.strokeStyle = "#51b24c";
+    else
+        ctx.strokeStyle = "#b16833";
+
+    var new_x = x + len * Math.cos(theta);
+    var new_y = y - len * Math.sin(theta);
+    ctx.lineWidth = depth * depth;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(new_x, new_y);
+    ctx.stroke();
+
+    var left = theta - Math.PI / 6;
+    var right = theta + Math.PI / 6;
+
+    tree(new_x, new_y, len * 0.7, left, depth - 1);
+    tree(new_x, new_y, len * 0.7, right, depth - 1);
+}
+
+tree(canvas.width / 2, canvas.height, canvas.height * 0.2, Math.PI / 2, 13);
+        </script>
+    </body>
+</html>

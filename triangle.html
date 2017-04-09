@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>コッホ曲線</title>
+    </head>
+    <body>
+        <canvas id="fractal"></canvas>
+        <script>
+var canvas = document.getElementById("fractal");
+canvas.width = 800;
+canvas.height = 800;
+
+var ctx = canvas.getContext("2d");
+var theta = Math.PI / 3;
+
+function triangle(x, y, len, depth){
+    if(depth <= 0) return 0;
+    var lx = x - len / 2 * Math.cos(theta);
+    var ly = y + len / 2 * Math.sin(theta);
+    var rx = x + len / 2 * Math.cos(theta);
+    var ry = y + len / 2 * Math.sin(theta);
+
+    ctx.fillStyle = "#000";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - len * Math.cos(theta), y + len * Math.sin(theta));
+    ctx.lineTo(x + len * Math.cos(theta), y + len * Math.sin(theta));
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.moveTo(x, y + len * Math.sin(theta));
+    ctx.lineTo(lx, ly);
+    ctx.lineTo(rx, ry);
+    ctx.closePath();
+    ctx.fill();
+
+    triangle(x, y, len / 2, depth - 1);
+    triangle(lx, ly, len / 2, depth - 1);
+    triangle(rx, ry, len / 2, depth - 1);
+}
+
+triangle(canvas.width / 2, 0, canvas.height * 0.6, 10);
+        </script>
+    </body>
+</html>
