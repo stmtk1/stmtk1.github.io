@@ -17,8 +17,10 @@ var ctx = canvas.getContext("2d");
 var cats = [], rats = [];
 canvas.width = 600;
 canvas.height = 600;
+
 var Cat = function(){
     this.r = 5;
+    this.visible = 30;
     this.pos = [
         Math.floor(Math.random() * (canvas.width - this.r * 2) + this.r),
         Math.floor(Math.random() * (canvas.width - this.r * 2) + this.r)
@@ -38,6 +40,28 @@ var Cat = function(){
             this.pos[i] += this.velocity[i];
         }
     }
+
+     // 距離の２乗
+     this.dist = function(animal){
+        var ret = 0;
+        for(var i = 0; i < 2; i++){
+            ret += (this.pos[i] - animal.pos[i]);
+        }
+        return ret;
+     }
+
+     this.decide_dir = function(){
+         var dir = [0, 0];
+         for(var i = 0; i < cats.length; i++){
+             var offset = [];
+             if(this.dist(cats[i]) < this.visible * this.visible) continue;
+             for(var j = 0; j < 2; j++){
+                offset[j] = cats[i].pos[j] - this.pos[i];
+             }
+         }
+     }
+
+     this.decide_dir();
 }
 
 var Rat = function(){
