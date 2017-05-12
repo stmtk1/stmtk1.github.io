@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTf-8" />
+        <title>追いかける</title>
+        <style>
+canvas {
+    border: solid;
+}
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var cats = [], rats = [];
+canvas.width = 600;
+canvas.height = 600;
+var Cat = function(){
+    this.r = 5;
+    this.pos = [
+        Math.floor(Math.random() * (canvas.width - this.r * 2) + this.r),
+        Math.floor(Math.random() * (canvas.width - this.r * 2) + this.r)
+    ];
+
+    var arg = Math.random() * 2 * Math.PI;
+    this.velocity = [Math.cos(arg), Math.sin(arg)];
+    
+    this.display = function(){
+        ctx.fillStyle = "#f00";
+        ctx.beginPath();
+        ctx.arc(this.pos[0], this.pos[1], this.r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+     this.move = function(){
+        for(var i = 0; i < 2; i++){
+            this.pos[i] += this.velocity[i];
+        }
+    }
+}
+
+var Rat = function(){
+    this.r = 5;
+    this.pos = [
+        Math.floor(Math.random() * (canvas.width - this.r * 2) + this.r),
+        Math.floor(Math.random() * (canvas.width - this.r * 2) + this.r)
+    ];
+
+    var arg = Math.random() * 2 * Math.PI;
+    this.velocity = [Math.cos(arg), Math.sin(arg)];
+    
+    this.display = function(){
+        ctx.fillStyle = "#00f";
+        ctx.beginPath();
+        ctx.arc(this.pos[0], this.pos[1], this.r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    this.move = function(){
+        for(var i = 0; i < 2; i++){
+            this.pos[i] += this.velocity[i];
+        }
+    }
+}
+
+function loop(){
+    for(var i = 0; i < cats.length; i++) cats[i].move();
+    for(var i = 0; i < rats.length; i++) rats[i].move();
+    display_all();
+    setTimeout(loop, 10);
+}
+
+function display_all(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(var i = 0; i < cats.length; i++){
+        cats[i].display();
+    }
+
+    for(var i = 0; i < rats.length; i++){
+        rats[i].display();
+    }
+}
+
+for(var i = 0; i < 100; i++){
+    cats.push(new Cat());
+}
+
+for(var i = 0; i < 100; i++){
+    rats.push(new Rat());
+}
+loop();
+
+        </script>
+    </body>
+</html>
