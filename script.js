@@ -1,9 +1,10 @@
 (async ()=>{
     const req = await fetch("index.json");
     const data = await req.json();
-    document.body.innerHTML += "<ul>";
+    var body = "<ul>";
     for(const item of data){
-        document.body.innerHTML += `<li><a href="${item}">${item}</a></li>`;
+        body += `<li><a href="${item}">${item}</a></li>`;
     }
-    document.body.innerHTML += "</ul>";
+    body += "</ul>";
+    document.body.innerHTML += body;
 })();
