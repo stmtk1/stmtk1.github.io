@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>3d test</title>
+        <script src="three.min.js"></script>
+        <script src="OrbitControls.js"></script>
+    </head>
+    <body>
+        <h1>hello world</h1>
+        <script>
+const size = 10;
+const margin = 3;
+var num = 11;
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+var renderer = new THREE.WebGLRenderer();
+var height = 0;
+var offset = 0;
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild( renderer.domElement );
+renderer.setClearColor("#eeeeee");
+var rule = new Array(512);
+for(var i = 0; i < rule.length; i++){
+    rule[i] = Math.floor(Math.random() * 2);
+}
+
+var states = new Array(num * num);
+for(var i = 0; i < states.length; i++){
+    states[i] = Math.floor(Math.random() * 2);
+}
+
+function draw(arr){
+    for(var i = 0; i < num; i++){
+        for(var j = 0; j < num; j++){
+            if(arr[i * num + j] == 0){
+                var cube = new THREE.Mesh( geometry, material_dead );
+            }else{
+                var cube = new THREE.Mesh( geometry, material_alive );
+            }
+            cube.position.set(i * (margin + size) + offset, j * (margin + size) + offset, height);
+            scene.add(cube);
+        }
+    }
+}
+
+function automaton(arr){
+    var old_num = num;
+    console.log(arr);
+    draw(arr);
+    num = Math.round(Math.sqrt(arr.length)) - 2;
+    height += size + margin;
+    offset += (size + margin);
+    if(arr.length < 2) return;
+    var next = new Array(num * num);
+    for(var i = 0; i < next.length; i++){
+        var bin_str = "";
+        var col = Math.floor(i / num);
+        var row = i % num;
+        for(var j = 0; j < 3; j++){
+            for(var k = 0; k < 3; k++){
+                bin_str += arr[(col + j) * old_num + row + k];
+            }
+        }
+        next[i] = rule[parseInt(bin_str, 2)];
+    }
+    automaton(next);
+    return next;
+}
+
+
+var geometry = new THREE.CubeGeometry(size, size, size);
+var material_alive = new THREE.MeshBasicMaterial({ color: "#fff000" });
+var material_dead = new THREE.MeshBasicMaterial({ color: "#000fff" });
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+
+// draw(states);
+camera.position.set(50, 50, 10);
+automaton(states);
+// camera.lookAt({x: (margin + size) * 50, y:(margin + size) * 50, z: 0 });
+
+function render(){
+    requestAnimationFrame(render);
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+render();
+        </script>
+    </body>
+</html>

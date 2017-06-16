@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+canvas.width = canvas.height = Math.min(window.innerWidth, window.innerHeight);
+var r = canvas.width / 12;
+var center = canvas.width / 2;
+
+function gem_color(){
+  var str = "#";
+  for(var i = 0; i < 3; i++){
+    var tmp = Math.floor(Math.random() * 255).toString(16);
+    if(tmp.length < 2) tmp = "0" + tmp;
+    str += tmp;
+  }
+  return str;
+}
+
+var poligon = function(n, r){
+    var points = new Array(n);
+    var color = gem_color();
+    for(var i = 0; i < n; i++){
+        var theta = Math.PI * 2 * i / n - Math.PI / 2;
+        points[i] = [center + Math.cos(theta) * r, center + Math.sin(theta) * r];
+    }
+    /*
+    var x = points[0][0];
+    var y = points[0][1];
+    var on_line = true;
+    */
+    var split = 50 - 2 * n;
+    var now = 0;
+    var side = 0;
+    
+    function move(){
+        if(now == split){
+            now = 0;
+            side += 1;
+        }else{
+            now += 1;
+        }
+    }
+
+    function decide_point(){
+        var x = (points[side % n][0] * (split - now) + points[(side + 1) % n][0] * now) / split;
+        var y = (points[side % n][1] * (split - now) + points[(side + 1) % n][1] * now) / split;
+        return [x, y];
+    }
+    
+    this.draw = function(){
+        ctx.strokeStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+        for(var i = 1; i < n; i++){
+            ctx.lineTo(points[i][0], points[i][1]);
+        }
+        ctx.closePath();
+        ctx.stroke();
+
+        var a = decide_point();
+        ctx.fillStyle = "#000";
+        ctx.beginPath();
+        ctx.arc(a[0], a[1], 5, 0, 2 * Math.PI);
+        ctx.fill();
+        move();
+    }
+}
+
+
+var poligons = new Array(10);
+for(var i = 0; i < poligons.length; i++){
+    r *= (1 / Math.cos(Math.PI / (i + 3)));
+    poligons[i] = new poligon(i + 3, r);
+    // poligons[i].draw();
+}
+
+function draw(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(var i = 0; i < poligons.length; i++){
+        poligons[i].draw();
+    }
+    setTimeout(draw, 100);
+}
+
+draw();
+
+/*
+function draw_poligon(n){
+  ctx.strokeStyle = gem_color();
+  ctx.beginPath();
+  ctx.moveTo(center, center- r);
+  for(var i = 0; i < n; i++){
+    var theta = Math.PI * 2 * i / n - Math.PI / 2;
+    ctx.lineTo(center + Math.cos(theta) * r, center + Math.sin(theta) * r);
+  }
+  ctx.closePath();
+  ctx.stroke();
+}
+
+function draw_many(n){
+  if(n >= 10) return;
+  r *= (1 / Math.cos(Math.PI / n));
+  draw_poligon(n);
+  /*
+  ctx.beginPath();
+  ctx.arc(center, center, r, 0, Math.PI * 2);
+  ctx.stroke();
+  */
+/*
+  draw_many(n + 1);
+
+}
+
+draw_many(3);
+
+/*
+ctx.beginPath();
+ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, Math.PI * 2);
+ctx.stroke();
+*/
+    </script>
+  </body>
+</html>
