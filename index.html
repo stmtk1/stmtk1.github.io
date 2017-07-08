@@ -3,8 +3,35 @@
     <head>
         <meta charset="UTf-8" />
         <title>追いかける</title>
+        <style>
+#canvas {
+    background-color: #006;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+body{
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+#container{
+    z-index: 1;
+    background-color: #ffffffa0;
+    margin: auto;
+    padding: 10px;
+    position: relative;
+}
+        </style>
         <script src="script.js" defer></script>
     </head>
     <body>
+        <canvas id="canvas">表示できません</canvas>
+        <div id="container"></div>
     </body>
 </html>
