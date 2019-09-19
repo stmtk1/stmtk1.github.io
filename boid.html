@@ -1,202 +1,159 @@
-<!DEOCTYPE html>
+<!DOCTYPE html>
 <html>
-	<head>
-	</head>
-	<body>
-		<script src="./processing.min.js"></script>
-		<script type="text/processing" data-processing-target="boid">
-class Boid{
-  PVector position;
-  PVector velocity;
-  PVector acceleration;
-  float r;
-  float maxforce;
-  float maxspeed;
-  
-  Boid(float x, float y){
-    acceleration = new PVector(0, 0);
-    float angle = random(TWO_PI);
-    velocity = new PVector(cos(angle), sin(angle));
-    position = new PVector(x, y);
-    r = 2.0;
-    maxspeed = 2;
-    maxforce = 0.03;
-  }
-  
-  void run(ArrayList<Boid> boids){
-    flock(boids);
-    update();
-    borders();
-    render();
-  }
-  
-  void borders(){
-    if(position.x < -r) position.x = width + r;
-    if(position.y < -r) position.y = height + r;
-    if(position.x > width + r) position.x = -r;
-    if(position.y > height + r) position.y = -r;
-  }
-  
-  void flock(ArrayList<Boid> boids){
-    PVector sep = separate(boids);
-    PVector ali = align(boids);
-    PVector coh = cohension(boids);
-    
-    sep.mult(1.5);
-    ali.mult(1.0);
-    coh.mult(1.0);
-    applyForce(sep);
-    applyForce(ali);
-    applyForce(coh);
-  }
-  
-  PVector align(ArrayList<Boid> boids){
-    float neighbordist = 50;
-    PVector sum = new PVector(0, 0, 0);
-    int count = 0;
-    
-    for(Boid other : boids){
-      float d = PVector.dist(position, other.position);
-      if((d > 0) && (d < neighbordist)){
-        sum.add(other.velocity);
-        count++;
-      }
-    }
-    
-    if(count > 0) {
-      sum.normalize();
-      //sum.div((float)count);
-      sum.mult(maxspeed);
-      PVector steer = PVector.sub(sum, velocity);
-      steer.limit(maxforce);
-      return steer;
-    } else{
-      return new PVector(0, 0);
-    }
-  }
-  
-  void update(){
-    velocity.add(acceleration);
-    velocity.limit(maxspeed);
-    position.add(velocity);
-    acceleration.mult(0);
-  }
-  
-  PVector separate(ArrayList<Boid> boids){
-    float desiredseparation = 18.0f;
-    PVector steer = new PVector(0, 0, 0);
-    int count = 0;
-    for(Boid other : boids){
-      float d = PVector.dist(position, other.position);
-      if((d > 0) && (d < desiredseparation)){
-        PVector diff = PVector.sub(position, other.position);
-        diff.normalize();
-        diff.div(d);
-        steer.add(diff);
-        count++;
-      }
-    }
-    
-    if(count > 0){
-      steer.div((float)count);
-    }
-    
-    if(steer.mag() > 0){
-      steer.normalize();
-      steer.mult(maxspeed);
-      steer.sub(velocity);
-      steer.limit(maxforce);
-    }
-    return steer;
-  }
-  
-  void applyForce(PVector force){
-    acceleration.add(force);
-  }
-    
-  void render(){
-    float theta =  velocity.heading2D() + radians(90);
-    fill(200, 200);
-    stroke(255);
-    pushMatrix();
-    translate(position.x, position.y);
-    rotate(theta);
-    beginShape(TRIANGLES);
-    vertex(0, -r * 2);
-    vertex(-r, r * 2);
-    vertex(r, r * 2);
-    endShape();
-    popMatrix();
-  }
-  
-  PVector seek(PVector target){
-    PVector desired = PVector.sub(target, position);
-    desired.normalize();
-    desired.mult(maxspeed);
-    PVector steer = PVector.sub(desired, velocity);
-    steer.limit(maxforce);
-    return steer;
-  }
-  
-  PVector cohension(ArrayList<Boid> boids){
-    float neighbordist = 50;
-    PVector sum = new PVector(0, 0);
-    int count = 0;
-    for(Boid other : boids){
-      float d = PVector.dist(position, other.position);
-      if((d > 0) && (d < neighbordist)){
-        sum.add(other.position);
-        count++;
-      }
-    }
-  
-    if(count > 0){
-      sum.div(count);
-      return seek(sum);
-    }else{
-      return new PVector(0, 0);
-    }
-  }
-}
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <title>Boid</title>
+    </head>
+    <body>
+    </body>
+    <script charset="utf-8">
+        const WIDTH = 800
+        const HEIGHT = 500
+        const RADIOUS = 10
+        const VELOCITY = 1
 
-class Flock {
-  ArrayList<Boid> boids;
-  
-  Flock(){
-    boids = new ArrayList<Boid>();
-  }
-  
-  void run(){
-    for(Boid b : boids){
-      b.run(boids);
-    }
-  }
-  
-  void addBoid(Boid b){
-    boids.add(b);
-  }
-}
+        class PVector {
+            constructor(x, y) {
+                this.x = x
+                this.y = y
+            }
 
-Flock flock;
+            add(other) {
+                return new PVector(this.x + other.x, this.y + other.y)
+            }
 
-void setup(){
-  size(1000, 1000);
-  flock = new Flock();
-  for(int i = 0; i < 150; i++){
-    flock.addBoid(new Boid(width / 2, height / 2));
-  }
-}
+            mult(scalar) {
+                return new PVector(this.x * scalar, this.y * scalar)
+            }
 
-void draw(){
-  background(50);
-  flock.run();
-}
+            sub(other) {
+                return other.mult(-1).add(this)
+            }
 
-void mousePressed(){
-  flock.addBoid(new Boid(mouseX, mouseY));
-}
+            size() {
+                return Math.sqrt(this.x * this.x + this.y * this.y)
+            }
 
-		</script>
-		<canvas id="boid"></canvas>
-	</body>
+            dist(other) {
+                return this.sub(other).size()
+            }
+
+            normalize() {
+                const size = this.size()
+                if(size == 0) {
+                    return this
+                }
+                return new PVector(this.x / size, this.y / size)
+            }
+
+            equal(other) {
+                return this.x == other.x && this.y == other.y
+            }
+        }
+
+        const create_svg = () => {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+            svg.setAttribute('viewBox', `0 0 ${ WIDTH } ${ HEIGHT }`)
+            svg.setAttribute('xmls', 'http://www.w3.org/2000/svg')
+            document.body.appendChild(svg)
+            return svg
+        }
+
+        const create_circle = (svg) => {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+            const theta = Math.PI * 2 * Math.random()
+            circle.setAttribute('r', RADIOUS)
+            circle.setAttribute('cx', Math.random() * WIDTH)
+            circle.setAttribute('cy', Math.random() * HEIGHT)
+            circle.setAttribute('vx', Math.cos(theta) * VELOCITY)
+            circle.setAttribute('vy', Math.sin(theta) * VELOCITY)
+            svg.appendChild(circle)
+            return circle
+        }
+
+        const move_balls = (circles) => {
+            for(const circle of circles) {
+                const vx = parseFloat(circle.getAttribute("vx"))
+                const vy = parseFloat(circle.getAttribute("vy"))
+                const cx = parseFloat(circle.getAttribute("cx"))
+                const cy = parseFloat(circle.getAttribute("cy"))
+                const new_cx = cx + vx
+                const new_cy = cy + vy
+                circle.setAttribute("cx", new_cx)
+                circle.setAttribute("cy", new_cy)
+                set_velocity(circle, circles)
+            }
+            within_screen(circles)
+            setTimeout(() => { move_balls(circles) }, 10)
+        }
+
+        const within_screen = (circles) => {
+            for(const circle of circles) {
+                const cx = parseFloat(circle.getAttribute("cx"))
+                const cy = parseFloat(circle.getAttribute("cy"))
+                if(cx < 0) {
+                    circle.setAttribute("cx", cx + WIDTH)
+                } else if(cx > WIDTH) {
+                    circle.setAttribute("cx", cx - WIDTH)
+                }
+                if(cy < 0) {
+                    circle.setAttribute("cy", cy + HEIGHT)
+                } else if(cy > HEIGHT) {
+                    circle.setAttribute("cy", cy - HEIGHT)
+                }
+            }
+        }
+
+        const get_velocity = (circle) => {
+            const vx = parseFloat(circle.getAttribute("vx"))
+            const vy = parseFloat(circle.getAttribute("vy"))
+            return new PVector(vx, vy)
+        }
+
+        const get_position = (circle) => {
+            const cx = parseFloat(circle.getAttribute("cx"))
+            const cy = parseFloat(circle.getAttribute("cy"))
+            return new PVector(cx, cy)
+        }
+
+        const set_velocity = (circle, circles) => {
+            const align_wight = 2;
+            const acc_size = 1;
+            const acceleration = new PVector(0, 0)
+                    .add(alignment(circle, circles).mult(align_wight))
+                    .normalize()
+                    .mult(acc_size)
+
+            const new_velocity = get_velocity(circle).add(acceleration).normalize()
+            circle.setAttribute("vx", new_velocity.x)
+            circle.setAttribute("vy", new_velocity.y)
+        }
+
+        const alignment = (circle, circles) => {
+            let ret = new PVector(0, 0);
+            for(const other of circles) {
+                this_pos = get_position(circle)
+                other_pos = get_position(other)
+                if(this_pos.equal(other_pos)) {
+                    continue
+                }
+                if(this_pos.dist(other_pos) >= 100) {
+                    continue;
+                }
+                ret = get_velocity(other).add(ret)
+            }
+            if(ret.size() != 0) {
+                console.log(ret.normalize(), ret)
+                return ret.normalize()
+            }
+            return ret
+        }
+
+        const main = () => {
+            const svg = create_svg()
+            const circles = new Array(100).fill(null).map(() => create_circle(svg))
+            move_balls(circles)
+        }
+        main()
+    </script>
 </html>
